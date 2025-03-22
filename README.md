@@ -1,3 +1,4 @@
+# Currently this only works for lightspeed filter agent until I find out a way to fix
 extflood3r 
 another hanger exploit (bro its been only like a month since extprint3r 😭)
 
